@@ -241,6 +241,7 @@ void afficherCylindre( )
 {
    cylindre->afficher();
 }
+
 // affiche une sphère de rayon 0.25, centrée en (0,0,0)
 void afficherSphere( )
 {
@@ -273,7 +274,12 @@ void afficherBestiole()
    matrModel.PushMatrix();{ // sauvegarder la tranformation courante
 
       // (partie 1) MODIFICATIONS ICI ...
-
+	
+	// Deplacer bestiole
+        //matrModel.Translate(2,2,0.5);
+	
+	//
+	
       // donner la couleur du corps
       glVertexAttrib3f( locColor, 0.0, 1.0, 0.0 ); // équivalent au glColor() de OpenGL 2.x
 
@@ -292,6 +298,11 @@ void afficherBestiole()
          case 1: // une bestiole (plutôt extraterrestre)
             // afficher le corps
             glVertexAttrib3f( locColor, 0.0, 1.0, 0.0 ); // vert; équivalent au glColor() de OpenGL 2.x
+		matrModel.Rotate(90,1,0,0);
+	    matrModel.Rotate(bestiole.angleCorps,0,1,0);
+	    //matrModel.Translate(0,1,0);
+	    matrModel.Translate(bestiole.position[0],bestiole.position[0],bestiole.position[1]);
+	    matrModel.Scale(bestiole.taille,bestiole.taille,bestiole.taille);
             matrModel.PushMatrix();{
                // ==> Avant de tracer, on doit informer la carte graphique des changements faits à la matrice de modélisation
                glUniformMatrix4fv( locmatrModel, 1, GL_FALSE, matrModel );
@@ -300,7 +311,8 @@ void afficherBestiole()
             // afficher la tête
             glVertexAttrib3f( locColor, 1.0, 0.0, 1.0 ); // magenta; équivalent au glColor() de OpenGL 2.x
             matrModel.PushMatrix();{
-               matrModel.Translate( 0.0, 2.0, 0.0 ); // (bidon) À MODIFIER
+               matrModel.Translate( 0.0, 1.0, 0.0 ); // (bidon) À MODIFIER
+	       matrModel.Scale(1,1,1);
                glUniformMatrix4fv( locmatrModel, 1, GL_FALSE, matrModel );
                afficherSphere();
             }matrModel.PopMatrix(); glUniformMatrix4fv( locmatrModel, 1, GL_FALSE, matrModel );
@@ -320,7 +332,10 @@ void afficherBestiole()
       // afficher les deux ailes
       glVertexAttrib3f( locColor, 1.0, 1.0, 0.0 ); // jaune; équivalent au glColor() de OpenGL 2.x
       matrModel.PushMatrix();{
-         matrModel.Translate( 0.0, 3.0, 0.0 ); // (bidon) À MODIFIER
+         matrModel.Translate( 1.5, -1.0, 1.5 ); // (bidon) À MODIFIER
+	matrModel.Scale(2,2,2);
+	
+
          // afficherRepereCourant( ); // débogage
          glUniformMatrix4fv( locmatrModel, 1, GL_FALSE, matrModel );
          afficherQuad();
@@ -330,7 +345,9 @@ void afficherBestiole()
       // afficher les quatre pattes
       glVertexAttrib3f( locColor, 0.5, 0.5, 1.0 ); // bleu foncé; équivalent au glColor() de OpenGL 2.x
       matrModel.PushMatrix();{
-         matrModel.Translate( 0.0, -3.0, 0.0 ); // (bidon) À MODIFIER
+         matrModel.Translate( bestiole.taille,bestiole.taille,bestiole.anglePatte); // (bidon) À MODIFIER - done
+	matrModel.Scale(bestiole.rayonPatte,bestiole.rayonPatte,bestiole.longPatte);
+	
          // afficherRepereCourant( ); // débogage
          glUniformMatrix4fv( locmatrModel, 1, GL_FALSE, matrModel );
          afficherCylindre();
