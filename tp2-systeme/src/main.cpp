@@ -325,7 +325,7 @@ void FenetreTP::initialiser()
    const GLuint connec[] = { 0, 1, 2, 2, 3, 0 };
 
    // partie 1: initialiser le VAO (quad)
-    glGenVertexArray(1,&vao);
+    glGenVertexArrays(1,&vao);
     glBindVertexArray(vao);
     
    // partie 1: créer les deux VBO pour les sommets et la connectivité
@@ -338,7 +338,7 @@ void FenetreTP::initialiser()
     glEnableVertexAttribArray( locVertex );
     
     // vbo connect
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, VBO[CONNECT] ); // connectivité
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[CONNECT] ); // connectivité
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(connec), connec,
 GL_STATIC_DRAW );
     
@@ -386,16 +386,16 @@ void afficherQuad( GLfloat alpha ) // le plan qui ferme les solides
    glVertexAttrib4f( locColor, 1.0, 1.0, 1.0, alpha );
    // afficher le plan tourné selon l'angle courant et à la position courante
    // partie 1: modifs ici ...
-   // ...
-    matrModel.Rotate(etat.angleCoupe,1,0,0);
-    matrModel.Translate(etat.planCoupe.x,etat.planCoupe.y,etat.planCoupe.z);
     
-    glBindvertexArray(&vba);
+    matrModel.Rotate(etat.angleCoupe,1,0,0);
+    matrModel.Translate(etat.planCoupe.x,0,-etat.planCoupe.w);
+    
+    // Met a jour les val de la matrModel
+    glUniformMatrix4fv(locmatrModel, 1, GL_FALSE, matrModel);
    
     glBindVertexArray( vao );
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
     glBindVertexArray(0);
-   // ...
 }
 
 void afficherModele()
