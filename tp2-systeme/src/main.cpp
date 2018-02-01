@@ -40,6 +40,8 @@ FormeTore *toreMars = NULL;
 FormeTore *toreJupiter = NULL;
 GLuint vao = 0;
 GLuint vbo[2] = {0,0};
+const int SOMMETS = 0;
+const int CONNECT = 1;
 
 //
 // variables d'état
@@ -323,10 +325,25 @@ void FenetreTP::initialiser()
    const GLuint connec[] = { 0, 1, 2, 2, 3, 0 };
 
    // partie 1: initialiser le VAO (quad)
-   // ...
+    glGenVertexArray(1,&vao);
+    glBindVertexArray(vao);
+    
    // partie 1: créer les deux VBO pour les sommets et la connectivité
-   // ...
-
+    glGenBuffers( 2, vbo );
+    
+    //vbo sommet
+    glBindBuffer( GL_ARRAY_BUFFER, vbo[SOMMETS] );
+    glBufferData( GL_ARRAY_BUFFER, sizeof(coo), coo, GL_STATIC_DRAW );
+    glVertexAttribPointer( locVertex, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+    glEnableVertexAttribArray( locVertex );
+    
+    // vbo connect
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, VBO[CONNECT] ); // connectivité
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(connec), connec,
+GL_STATIC_DRAW );
+    
+    //clear la cache??
+    glBindVertexArray(0);
    // ...
 
    // construire le graphe de scène
@@ -370,9 +387,14 @@ void afficherQuad( GLfloat alpha ) // le plan qui ferme les solides
    // afficher le plan tourné selon l'angle courant et à la position courante
    // partie 1: modifs ici ...
    // ...
-   // glBindVertexArray( vao );
-   // glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
-   // glBindVertexArray(0);
+    matrModel.Rotate(etat.angleCoupe,1,0,0);
+    matrModel.Translate(etat.planCoupe.x,etat.planCoupe.y,etat.planCoupe.z);
+    
+    glBindvertexArray(&vba);
+   
+    glBindVertexArray( vao );
+    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+    glBindVertexArray(0);
    // ...
 }
 
