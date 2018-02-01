@@ -1,7 +1,5 @@
-// Prénoms, noms et matricule des membres de l'équipe:
-// - Prénom1 NOM1 (matricule1)
-// - Prénom2 NOM2 (matricule2)
-#warning "Écrire les prénoms, noms et matricule des membres de l'équipe dans le fichier et commenter cette ligne"
+﻿// Prénoms, noms et matricule des membres de l'équipe:
+// - Constantin Bouis 1783438// - Soufiane Houimidi 1819034
 
 #include <iostream>
 #include <math.h>
@@ -204,10 +202,16 @@ void FenetreTP::initialiser()
 
    // (partie 2) MODIFICATIONS ICI ...
    // créer le VBO pour les sommets
-   // ...
+   glGenBuffers( sizeof(vboTheiereSommets), &vboTheiereSommets);
+   glBindBuffer( GL_ARRAY_BUFFER, vboTheiereSommets );
+   glBufferData( GL_ARRAY_BUFFER, sizeof(gTheiereSommets), gTheiereSommets, GL_STATIC_DRAW );
+   glVertexAttribPointer( locVertex, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+   glEnableVertexAttribArray(locVertex);
 
    // créer le VBO la connectivité
-   // ...
+   glGenBuffers( sizeof(vboTheiereSommets), &vboTheiereConnec);
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboTheiereConnec );
+   glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(gTheiereConnec), gTheiereConnec, GL_STATIC_DRAW );
 
    glBindVertexArray(0);
 
@@ -261,11 +265,12 @@ void afficherTheiere()
 {
    glBindVertexArray( vao[1] );
    // (partie 2) MODIFICATIONS ICI ...
+   glDrawElements(GL_TRIANGLES, sizeof(gTheiereConnec), GL_UNSIGNED_INT,0);
    // vous pouvez utiliser temporairement cette fonction pour la première partie du TP, mais vous ferez mieux dans la seconde partie du TP
-   glBegin( GL_TRIANGLES );
+  /* glBegin( GL_TRIANGLES );
    for ( unsigned int i = 0 ; i < sizeof(gTheiereConnec)/sizeof(GLuint) ; i++ )
       glVertex3fv( &(gTheiereSommets[3*gTheiereConnec[i]] ) );
-   glEnd( );
+   glEnd( );*/
    glBindVertexArray(0);
 }
 

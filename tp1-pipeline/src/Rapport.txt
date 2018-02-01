@@ -4,6 +4,13 @@ Q1: Supposons que les coordonnées du modèle soient exprimées dans un système
     afin de préserver le même effet visuel d'une rotation positive ?  Quelle
     serait la nouvelle matrice pour une rotation autour de l'axe des Z ?
 
+REP1: Quand on change le systeme de coordonnées de la main droite à la main gauche, l'axe des X c'est le seul qui change d'orientation du droite à la gauche aussi. Donc il faudra changer les coordonnées qui sont modifies pas l'axe des x.
+
+			|	-cosθ	-sinθ	 0	0	|
+			|	sinθ	cosθ	 0	0	|
+			|	 0	 0	 1	0	|
+			|	 0	 0	 0	1	|
+
 
 
 Q2: Dans ce TP, on peut déplacer la bestiole avec les flèches du clavier ou
@@ -18,3 +25,5 @@ Q2: Dans ce TP, on peut déplacer la bestiole avec les flèches du clavier ou
     soit toujours dirigée dans le sens de son mouvement ?
     Décrivez (avec assez de détails) comment vous implanteriez ceci dans ce TP.
 
+
+REP2: Pour que la tete et le corps pointent toujours en avant, il faut qu<on enleve la rotation de la bestiole autour de laxe des Z, et il faut faire une observation de l'objet du plan XY (modifiant la methode calculerPhysique()). Apres il faut trouver l\angle de rotation positif, tout en calculant arctang(x/y) ou x et y la position de la bestiole.
