@@ -103,7 +103,8 @@ public:
       rotation(rot), revolution(rev),
       vitRotation(vitRot), vitRevolution(vitRev),
       couleur(coul)
-   { }
+
+   {}
 
    void ajouteEnfant( CorpsCeleste &bebe )
    {
@@ -156,9 +157,15 @@ public:
 
    void avancerPhysique()
    {
+      if(!estSelectionne){
       const float dt = 0.5; // intervalle entre chaque affichage (en secondes)
       rotation += dt * vitRotation;
       revolution += dt * vitRevolution;
+      }
+      else{
+            rotation = 0 ;
+            revolution = 0 ;
+      }
    }
 
    std::vector<CorpsCeleste*> enfants; // la liste des enfants
@@ -169,7 +176,7 @@ public:
    float vitRotation;    // la vitesse de rotation
    float vitRevolution;  // la vitesse de révolution
    glm::vec4 couleur;    // la couleur du corps
-   //bool estSelectionne;  // le corps est sélectionné ?
+   bool estSelectionne =  false;  // le corps est sélectionné ?
    //glm::vec3 couleurSel; // la couleur en mode sélection
 };
 
@@ -384,6 +391,8 @@ void FenetreTP::conclure()
 
 void afficherQuad( GLfloat alpha ) // le plan qui ferme les solides
 {
+
+   matrModel.PushMatrix(); {
    glVertexAttrib4f( locColor, 1.0, 1.0, 1.0, alpha );
    // afficher le plan tourné selon l'angle courant et à la position courante
    // partie 1: modifs ici ...
@@ -397,6 +406,7 @@ void afficherQuad( GLfloat alpha ) // le plan qui ferme les solides
     glBindVertexArray( vao );
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
     glBindVertexArray(0);
+   }matrModel.PopMatrix(); glUniformMatrix4fv( locmatrModel, 1, GL_FALSE, matrModel );
 }
 
 void afficherModele()
