@@ -12,6 +12,7 @@ uniform vec4 planCoupe; // équation du plan de coupe
 layout(location=0) in vec4 Vertex;
 layout(location=3) in vec4 Color;
 
+
 out Attribs {
    vec4 couleur;
    // float clipDistance;
