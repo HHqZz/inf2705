@@ -1,10 +1,11 @@
 // Prénoms, noms et matricule des membres de l'équipe:
-// - Prénom1 NOM1 (matricule1)
-// - Prénom2 NOM2 (matricule2)
-#warning "Écrire les prénoms, noms et matricule des membres de l'équipe dans le fichier et commenter cette ligne"
+// - Constantin Bouis (1783438)
+// - Soufiane Houimidi (matricule2)
+//#warning "Écrire les prénoms, noms et matricule des membres de l'équipe dans le fichier et commenter cette ligne"
 
 #include <stdlib.h>
 #include <iostream>
+
 #include "inf2705-matrice.h"
 #include "inf2705-nuanceur.h"
 #include "inf2705-fenetre.h"
@@ -446,10 +447,29 @@ void FenetreTP::afficherScene( )
 
    // afficher le modèle et tenir compte du stencil et du plan de coupe
    // partie 1: modifs ici ...
-   afficherModele();
+  
+   glEnable(GL_STENCIL_TEST);
 
-   // en plus, dessiner le plan en transparence pour bien voir son étendue
-   afficherQuad( 0.25 );
+   // Met des 1 dans le stencil
+   glStencilFunc(GL_ALWAYS, 1, 1);
+   glStencilOp(GL_ZERO, GL_ZERO, GL_INCR);
+
+   glDisable( GL_DEPTH_TEST );
+     
+   glEnable( GL_CLIP_PLANE0 );
+   afficherModele(); 
+   glDisable( GL_CLIP_PLANE0 );
+
+   glStencilFunc(GL_EQUAL, 1, 1 );  // draw if == planete
+   glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP); // troiseme argument ??
+   afficherQuad(1);
+ 
+   // en plus, dessiner le  plan en transparence pour bien voir son étendue
+  
+   glEnable(GL_BLEND);
+   afficherQuad(0.25);
+   glDisable(GL_BLEND);
+   
 }
 
 void FenetreTP::redimensionner( GLsizei w, GLsizei h )
