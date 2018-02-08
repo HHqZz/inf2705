@@ -132,7 +132,10 @@ public:
 
             // la couleur du corps
             glVertexAttrib4fv( locColor, glm::value_ptr(couleur) );
-
+            if(couleur.a <1){
+                  glDepthMask(GL_FALSE);
+                  glEnable(GL_BLEND);
+            }
             switch ( etat.modele )
             {
             default:
@@ -149,7 +152,10 @@ public:
                theiere->afficher( );
                break;
             }
-
+            if (couleur.a < 1) {
+               glDepthMask( GL_TRUE );
+               glDisable( GL_BLEND );
+            }
          } matrModel.PopMatrix(); glUniformMatrix4fv( locmatrModel, 1, GL_FALSE, matrModel );
 
       } matrModel.PopMatrix(); glUniformMatrix4fv( locmatrModel, 1, GL_FALSE, matrModel );
@@ -162,10 +168,7 @@ public:
       rotation += dt * vitRotation;
       revolution += dt * vitRevolution;
       }
-      else{
-            rotation = 0 ;
-            revolution = 0 ;
-      }
+
    }
 
    std::vector<CorpsCeleste*> enfants; // la liste des enfants
@@ -462,9 +465,8 @@ void FenetreTP::afficherScene( )
 
    // Met des 1 dans le stencil
    glStencilFunc(GL_ALWAYS, 1, 1);
-   glStencilOp(GL_ZERO, GL_ZERO, GL_INCR);
+   glStencilOp(GL_ZERO, GL_INCR, GL_INCR);
 
-   glDisable( GL_DEPTH_TEST );
      
    glEnable( GL_CLIP_PLANE0 );
    afficherModele(); 
@@ -474,6 +476,7 @@ void FenetreTP::afficherScene( )
    glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP); // troiseme argument ??
    afficherQuad(1);
  
+   glDisable(GL_STENCIL_TEST);
    // en plus, dessiner le  plan en transparence pour bien voir son étendue
   
    glEnable(GL_BLEND);
@@ -645,7 +648,22 @@ int main( int argc, char *argv[] )
 
       // affichage
       fenetre.afficherScene();
-      fenetre.swap();
+      if((!Soleil.estSelectionne)      &&
+            (!Terre.estSelectionne)    &&
+            (!Lune.estSelectionne)     &&
+            (!Mars.estSelectionne)     &&
+            (!Phobos.estSelectionne)   &&
+            (!Deimos.estSelectionne)   &&
+            (!Jupiter.estSelectionne)  &&
+            (!Io.estSelectionne)       &&
+            (!Europa.estSelectionne)   &&
+            (!Ganymede.estSelectionne) &&
+            (!Callisto.estSelectionne) )
+
+      {
+            fenetre.swap();
+      }
+
 
       // récupérer les événements et appeler la fonction de rappel
       boucler = fenetre.gererEvenement();
