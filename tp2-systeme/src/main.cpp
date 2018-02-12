@@ -181,16 +181,14 @@ public:
 
    void avancerPhysique()
    {
+         if(!etat.modeSelection){
          // Si un astre nest pas selectionne 
-      if(!this->estSelectionne){
-       const float dt = 0.5; // intervalle entre chaque affichage (en secondes)
-       rotation += dt * vitRotation;
-       revolution += dt * vitRevolution;
-      }
-      
-     
-      
-
+            if(!this->estSelectionne){
+            const float dt = 0.5; // intervalle entre chaque affichage (en secondes)
+            rotation += dt * vitRotation;
+            revolution += dt * vitRevolution;
+            }
+         }
    }
 
    std::vector<CorpsCeleste*> enfants; // la liste des enfants
