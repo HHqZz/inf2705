@@ -368,14 +368,21 @@ void FenetreTP::initialiser()
 
    GLfloat sommets[3*4*6] =
    {
-	  -1.0,  1.0, -1.0,    1.0,  1.0, -1.0,  -1.0, -1.0, -1.0,    1.0, -1.0, -1.0,   // P3,P2,P0,P1
-	   1.0, -1.0,  1.0,   -1.0, -1.0,  1.0,   1.0, -1.0, -1.0,   -1.0, -1.0, -1.0,   // P5,P4,P1,P0
-	   1.0,  1.0,  1.0,    1.0, -1.0,  1.0,   1.0,  1.0, -1.0,    1.0, -1.0, -1.0,   // P6,P5,P2,P1
-	  -1.0,  1.0,  1.0,    1.0,  1.0,  1.0,  -1.0,  1.0, -1.0,    1.0,  1.0, -1.0,   // P7,P6,P3,P2
-	  -1.0, -1.0,  1.0,   -1.0,  1.0,  1.0,  -1.0, -1.0, -1.0,   -1.0,  1.0, -1.0,   // P4,P7,P0,P3
-	  -1.0, -1.0,  1.0,    1.0, -1.0,  1.0,  -1.0,  1.0,  1.0,    1.0,  1.0,  1.0    // P4,P5,P7,P6
+	  -1.0,  1.0, -1.0,    1.0,  1.0, -1.0,  -1.0, -1.0, -1.0,    1.0, -1.0, -1.0,   // P3,P2,P0,P1  Face arriere : normale = (0,0,-1)  0.0, 0.0, -1.0,
+	   1.0, -1.0,  1.0,   -1.0, -1.0,  1.0,   1.0, -1.0, -1.0,   -1.0, -1.0, -1.0,   // P5,P4,P1,P0 Face bas : normale = (0,-1,0) 0.0, -1.0, 0.0,
+	   1.0,  1.0,  1.0,    1.0, -1.0,  1.0,   1.0,  1.0, -1.0,    1.0, -1.0, -1.0,   // P6,P5,P2,P1 Face avant : normale = (0,0,1) 0.0,0.0,1.0,
+	  -1.0,  1.0,  1.0,    1.0,  1.0,  1.0,  -1.0,  1.0, -1.0,    1.0,  1.0, -1.0,   // P7,P6,P3,P2 Face dessus : normale = ( 0,1,0) 0.0, 1.0, 0.0, 
+	  -1.0, -1.0,  1.0,   -1.0,  1.0,  1.0,  -1.0, -1.0, -1.0,   -1.0,  1.0, -1.0,   // P4,P7,P0,P3	Face gauche : normale =(-1,0,0 ) -1.0, 0.0, 0.0, 
+	  -1.0, -1.0,  1.0,    1.0, -1.0,  1.0,  -1.0,  1.0,  1.0,    1.0,  1.0,  1.0    // P4,P5,P7,P6	Face droite : normale = (1,0,0) 1.0, 0.0, 0.0,
    };
-   // GLfloat normales[3*4*6] = ...
+   GLfloat normales[3*4*6] = {
+	  0.0, 0.0, -1.0,   0.0, 0.0, -1.0,  0.0, 0.0, -1.0,    0.0, 0.0, -1.0,   // P3,P2,P0,P1
+	   0.0, -1.0, 0.0,   0.0, -1.0, 0.0,   0.0, -1.0, 0.0,   0.0, -1.0, 0.0,  // P5,P4,P1,P0
+	   0.0, 0.0, 1.0,    0.0, 0.0, 1.0,   0.0, 0.0, 1.0,    0.0, 0.0, 1.0,   // P6,P5,P2,P1
+	  0.0, 1.0, 0.0,    0.0, 1.0, 0.0,  0.0, 1.0, 0.0,    0.0, 1.0, 0.0,   // P7,P6,P3,P2
+	  -1.0, 0.0, 0.0,    -1.0, 0.0, 0.0,   -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,    // P4,P7,P0,P3
+	  1.0, 0.0, 0.0,    1.0, 0.0, 0.0,  1.0, 0.0, 0.0,   1.0, 0.0, 0.0    // P4,P5,P7,P6
+   };
 
    // allouer les objets OpenGL
    glGenVertexArrays( 2, vao );
@@ -389,7 +396,11 @@ void FenetreTP::initialiser()
    glVertexAttribPointer( locVertex, 3, GL_FLOAT, GL_FALSE, 0, 0 );
    glEnableVertexAttribArray(locVertex);
    // (partie 1) charger le VBO pour les normales
-   // ...
+   glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+   glBufferData( GL_ARRAY_BUFFER, sizeof(normales), normales, GL_STATIC_DRAW );
+   glVertexAttribPointer( locVertex, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+   glEnableVertexAttribArray(locVertex);
+
    // (partie 3) charger le VBO pour les coordonnées de texture
    // ...
 

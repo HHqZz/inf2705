@@ -31,6 +31,10 @@ runs : ; make SRC=$(SRC)Solution run
 
 clean :
 	rm -rf *.o *.exe *.exe.dSYM
+	
+res :
+	make clean
+	make run
 
 remise zip :
 	make clean
