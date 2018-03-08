@@ -1,5 +1,10 @@
 #version 410
 
+/*usefull const */
+const int LAMBERT = 0;
+const int GOURAUD = 1;
+const int PHONG = 2;
+
 // Définition des paramètres des sources de lumière
 layout (std140) uniform LightSourceParameters
 {
@@ -59,13 +64,37 @@ layout(location=3) in vec4 Color;
 layout(location=8) in vec4 TexCoord;
 
 out Attribs {
-   vec4 couleur;
+    vec4 couleur;
+    vec3 normale;
+
+    vec3 directionObserv;
+    vec3 directionLight;
+    
+    vec2 posText;
 } AttribsOut;
 
 vec4 calculerReflexion( in vec3 L, in vec3 N, in vec3 O )
 {
-   vec4 grisUniforme = vec4(0.7,0.7,0.7,1.0);
-   return( vec4(0.0) );
+
+
+   /* Calcul des reflexions */
+    vec4 reflexAmbi =  FrontMaterial.emission + 
+                      FrontMaterial.ambient * LightModel.ambient + 
+                      FrontMaterial.ambient * LightSource[0].ambient ; 
+
+    vec4 reflexDiffuse = FrontMaterial.diffuse * LightSource[0].diffuse * max(dot(L,N), 0);
+    float k = 0;
+    if(utiliseBlinn){
+        k = max(0, dot(normalize(L+O),N));
+    }
+    else{
+        k = max(0,dot(reflect(-L,N), O));
+   }
+
+   vec4 reflexSpecular = FrontMaterial.specular * LightSource[0].specular * pow(k, FrontMaterial.shininess);
+
+   return clamp(reflexAmbi + reflexDiffuse + reflexSpecular, 0 , 1);
+                      
 }
 
 void main( void )
@@ -73,7 +102,23 @@ void main( void )
    // transformation standard du sommet
    gl_Position = matrProj * matrVisu * matrModel * Vertex;
 
+    vec3 N = normalize(matrNormale * Normal),
+         L = normalize((matrVisu*LightSource[0].position).xyz - vec3(matrVisu * matrModel * Vertex)),
+         O = normalize(-vec3(matrVisu * matrModel * Vertex));
+
    // couleur du sommet
-   //AttribsOut.couleur = calculerReflexion( L, N, O );
-   AttribsOut.couleur = Color; // à modifier!
+   if(typeIllumination == GOURAUD){
+       AttribsOut.couleur = calculerReflexion(L,N,O);
+   }
+   else{
+       AttribsOut.couleur = Color;
+   }
+   
+   AttribsOut.normale = N;
+
+   AttribsOut.directionLight = L;
+   AttribsOut.directionObserv = O;
+
+   AttribsOut.posText = TexCoord.st;
+
 }

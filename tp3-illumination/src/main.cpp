@@ -11,6 +11,13 @@
 #include "inf2705-texture.h"
 #include "inf2705-forme.h"
 
+
+/* usefull const */
+const int DE = 0;
+const int ECHIQUIER = 1;
+const int METAL = 2;
+const int MOSAIQUE = 3;
+
 // variables pour l'utilisation des nuanceurs
 GLuint prog;      // votre programme de nuanceurs
 GLint locVertex = -1;
@@ -384,6 +391,26 @@ void FenetreTP::initialiser()
 	  1.0, 0.0, 0.0,    1.0, 0.0, 0.0,  1.0, 0.0, 0.0,   1.0, 0.0, 0.0    // P4,P5,P7,P6
    };
 
+   GLfloat posTex[2*4*6] = 
+   {
+      1/3, 1/3, 2/3, 1/3, 1/3, 2/3, 2/3, 2/3, 
+      1/3, 0, 2/3, 0, 1/3, 1/3, 2/3, 1/3,
+      0, 1/3, 1/3, 1/3, 0, 2/3, 1/3, 2/3,
+      1/3, 2/3, 2/3, 2/3, 1/3, 1, 2/3, 1,
+      2/3, 0, 1, 0.0, 2/3, 1/3, 1, 1/3,
+      2/3, 1/3, 1, 1/3, 2/3, 2/3, 1, 2/3	   
+   };
+   
+    GLfloat posTex2[2*4*6] = 
+   {
+      0, 0, 0.3, 0, 0, 0.3, 0.3, 0.3,
+      0, 0, 0.3, 0, 0, 0.3, 0.3, 0.3,
+      0, 0, 0.3, 0, 0, 0.3, 0.3, 0.3,
+      0, 0, 0.3, 0, 0, 0.3, 0.3, 0.3,
+      0, 0, 0.3, 0, 0, 0.3, 0.3, 0.3,
+      0, 0, 0.3, 0, 0, 0.3, 0.3, 0.3, 
+   };
+
    // allouer les objets OpenGL
    glGenVertexArrays( 2, vao );
    glGenBuffers( 5, vbo );
@@ -395,14 +422,25 @@ void FenetreTP::initialiser()
    glBufferData( GL_ARRAY_BUFFER, sizeof(sommets), sommets, GL_STATIC_DRAW );
    glVertexAttribPointer( locVertex, 3, GL_FLOAT, GL_FALSE, 0, 0 );
    glEnableVertexAttribArray(locVertex);
-   // (partie 1) charger le VBO pour les normales
+   // charger le VBO pour les normales
    glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
    glBufferData( GL_ARRAY_BUFFER, sizeof(normales), normales, GL_STATIC_DRAW );
-   glVertexAttribPointer( locVertex, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+   glVertexAttribPointer( locNormal, 3, GL_FLOAT, GL_FALSE, 0, 0 );
    glEnableVertexAttribArray(locNormal);
 
-   // (partie 3) charger le VBO pour les coordonnées de texture
-   // ...
+   // charger le VBO pour les coordonnées de texture
+	
+		// text1
+		glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(posTex), posTex, GL_STATIC_DRAW );
+		glVertexAttribPointer( locTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0 );
+		glEnableVertexAttribArray(locTexCoord);
+
+		// text2
+		glBindBuffer( GL_ARRAY_BUFFER, vbo[3] );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(posTex2), posTex2, GL_STATIC_DRAW );
+		glVertexAttribPointer( locTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0 );
+		glEnableVertexAttribArray(locTexCoord);
 
    glBindVertexArray(0);
 
@@ -442,23 +480,28 @@ void FenetreTP::conclure()
 
 void afficherModele()
 {
-   // partie 3: paramètres de texture
+   // paramètres de texture
    switch ( varsUnif.texnumero )
    {
    default:
+   // ? faut mettre une texture par def ? sans texture ?
 	  //std::cout << "Sans texture" << std::endl;
 	  break;
    case 1:
-	  //std::cout << "Texture 1 DE" << std::endl;
+	 	//std::cout << "Texture 1 DE" << std::endl;
+		glBindTexture(GL_TEXTURE_2D, textures[DE]);
 	  break;
    case 2:
-	  //std::cout << "Texture 2 ECHIQUIER" << std::endl;
+	  	//std::cout << "Texture 2 ECHIQUIER" << std::endl;
+		glBindTexture(GL_TEXTURE_2D, textures[ECHIQUIER]);
 	  break;
    case 3:
-	  //std::cout << "Texture 3 METAL" << std::endl;
+	  	//std::cout << "Texture 3 METAL" << std::endl;
+		glBindTexture(GL_TEXTURE_2D, textures[METAL]);
 	  break;
    case 4:
-	  //std::cout << "Texture 4 MOSAIQUE" << std::endl;
+	  	//std::cout << "Texture 4 MOSAIQUE" << std::endl;
+	  	glBindTexture(GL_TEXTURE_2D, textures[MOSAIQUE]);
 	  break;
    }
 
@@ -472,6 +515,7 @@ void afficherModele()
 	  // (partie 1: ne pas oublier de calculer et donner une matrice pour les transformations des normales)
 		glm::mat3 matrNormale = glm::inverse(glm::mat3(matrVisu.getMatr()*matrModel.getMatr()));
 	  	glUniformMatrix3fv(locmatrNormale, 1, GL_TRUE, glm::value_ptr(matrNormale));
+	  
 	  switch ( etat.modele )
 	  {
 	  default:
@@ -522,6 +566,7 @@ void afficherLumiere()
    // Dessiner la lumiere
 
    // tracer une ligne vers la source lumineuse
+   // MARCHE PAS !!         EDIT : ha si >_<
    const GLfloat fact = 5.;
    GLfloat coords[] =
    {
@@ -625,7 +670,8 @@ void FenetreTP::afficherScene()
    glUniformMatrix4fv( locmatrProj, 1, GL_FALSE, matrProj );
    glUniformMatrix4fv( locmatrVisu, 1, GL_FALSE, matrVisu );
    glUniformMatrix4fv( locmatrModel, 1, GL_FALSE, matrModel );
-   //glActiveTexture( GL_TEXTURE0 ); // activer la texture '0' (valeur de défaut)
+   // --next line - decomented
+   glActiveTexture( GL_TEXTURE0 ); // activer la texture '0' (valeur de défaut)
    glUniform1i( loclaTexture, 0 ); // '0' => utilisation de GL_TEXTURE0
 
    afficherModele();

@@ -51,22 +51,19 @@ layout (std140) uniform varsUnif
    int afficheTexelFonce;    // un texel noir doit-il être affiché 0:noir, 1:mi-coloré, 2:transparent?
 };
 
+uniform mat4 matrVisu;
 uniform sampler2D laTexture;
 
 /////////////////////////////////////////////////////////////////
 
 in Attribs {
    vec4 couleur;
-   vec4 IntensiteGouraud;
-
-
-   vec3 directionLumiere;
+   vec3 normale;
+   
    vec3 directionObserv;
-
-   vec3 normales;
-   vec3 faceNormale;
-
-   vec2 posTexture;
+   vec3 directionLight;
+   
+   vec2 posText;
 
 } AttribsIn;
 
@@ -107,11 +104,12 @@ vec4 calculerReflexion( in vec3 L, in vec3 N, in vec3 O )
 
     /* Calcul reflexion Speculaire */
     vec4 reflSpeculaire;
+    float k = 0 ;
     if(utiliseBlinn){
-        float k = max(0, dot(normalize(L+O), N));
+         k = max(0, dot(normalize(L+O), N));
     }
     else {
-        float k = max(0, dot(reflect(-L, N), O));
+         k = max(0, dot(reflect(-L, N), O));
     }
     
     reflSpeculaire = FrontMaterial.specular *
@@ -123,23 +121,26 @@ vec4 calculerReflexion( in vec3 L, in vec3 N, in vec3 O )
 
 void main( void )
 {
-    vec4 texture = texture(laTexture, AttribsIn.posTexture);
+    vec4 texture = texture(laTexture, AttribsIn.posText);
     
-    if(typeIllumination == PHONG || typeIllumination == LAMBERT ||){
-        FragColor = calculerReflexion(normalize(AttribsIn.directionLumiere), 
-                    normalize(AttribsIn.normales), normalize(AttribsIn.directionObserv));
+    if(typeIllumination == PHONG || typeIllumination == LAMBERT ){
+        FragColor = calculerReflexion(
+                        normalize(AttribsIn.directionLight),
+                        normalize(AttribsIn.normale),
+                        normalize(AttribsIn.directionObserv)
+                        );
     }
 
     else {
         FragColor = AttribsIn.couleur;
     }
 
-    if(texnumero){
+    if(texnumero!=0 ){
         if(afficheTexelFonce ==1 ){
             FragColor = FragColor *(texture+1)/2;
         }
-        else if (afficheTexelFonce ==2 && ((texture.r + texture.g + texture.b) / 3.0) < 0.1){
-            discard //shouldn't write any pixel
+        else if (afficheTexelFonce ==2 && (((texture.r + texture.g + texture.b) / 3.0) < 0.1)){
+            discard; //shouldn't write any pixel
         }
         else {
             FragColor = FragColor * texture ;
@@ -148,8 +149,7 @@ void main( void )
   if ( afficheNormales ) {
       FragColor = vec4(normalize(AttribsIn.normale),1.0);
    } else {
-      uniform mat3 matrVisu;
-      FragColor *= calculerSpot(transpose(inverse(matrVisu)) * LightSource[0].spotDirection, normalize(AttribsIn.directionLumiere));
+      FragColor *= calculerSpot(transpose(inverse(mat3(matrVisu))) * LightSource[0].spotDirection, normalize(AttribsIn.directionLight));
    }
 
 }
