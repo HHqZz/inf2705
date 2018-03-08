@@ -1,5 +1,10 @@
 #version 410
 
+/* usefull const */
+const float PI = 3.1415926535897932384626433832795;
+const int GOURAUD = 1 ;
+const int LAMBERT = 0 ;
+const int PHONG = 2 ;
 // Définition des paramètres des sources de lumière
 layout (std140) uniform LightSourceParameters
 {
@@ -52,31 +57,99 @@ uniform sampler2D laTexture;
 
 in Attribs {
    vec4 couleur;
+   vec4 IntensiteGouraud;
+
+
+   vec3 directionLumiere;
+   vec3 directionObserv;
+
+   vec3 normales;
+   vec3 faceNormale;
+
+   vec2 posTexture;
+
 } AttribsIn;
 
 out vec4 FragColor;
 
 float calculerSpot( in vec3 spotDir, in vec3 L )
 {
-   return( 0.0 );
+    spotDir = normalize(spotDir);
+    L = normalize(L);
+
+    float gamma = dot(spotDir, -L);
+    float inner=cos(LightSource[0].spotAngleOuverture * PI/180 );
+    float outter = pow(inner, 1.01 + LightSource[0].spotExponent / 2);
+
+    // Direct 3D
+    if(utiliseDirect){
+        return smoothstep(outter, inner,gamma);
+    }
+    
+    if(inner<=gamma){
+        return pow(gamma, LightSource[0].spotExponent/2);
+
+    }
+    return 0;
 }
 
 vec4 calculerReflexion( in vec3 L, in vec3 N, in vec3 O )
 {
-   vec4 grisUniforme = vec4(0.7,0.7,0.7,1.0);
-   return( vec4(0.0) );
+    /* Calcul reflexion Ambiante */
+    vec4 reflAmbiante = FrontMaterial.emission + 
+                        FrontMaterial.ambient*LightModel.ambient  +
+                        FrontMaterial.ambient*LightSource[0].ambient ;
+
+    /* Calcul reflexion Diffuse */
+    vec4 reflDiffuse =  FrontMaterial.diffuse *
+                        LightSource[0].diffuse *
+                        max(dot(L,N),0);
+
+    /* Calcul reflexion Speculaire */
+    vec4 reflSpeculaire;
+    if(utiliseBlinn){
+        float k = max(0, dot(normalize(L+O), N));
+    }
+    else {
+        float k = max(0, dot(reflect(-L, N), O));
+    }
+    
+    reflSpeculaire = FrontMaterial.specular *
+                     LightSource[0].specular *
+                     pow(k,FrontMaterial.shininess);
+
+    return clamp(reflAmbiante + reflDiffuse + reflSpeculaire, 0, 1);
 }
 
 void main( void )
 {
-   // ...
+    vec4 texture = texture(laTexture, AttribsIn.posTexture);
+    
+    if(typeIllumination == PHONG || typeIllumination == LAMBERT ||){
+        FragColor = calculerReflexion(normalize(AttribsIn.directionLumiere), 
+                    normalize(AttribsIn.normales), normalize(AttribsIn.directionObserv));
+    }
 
-   // assigner la couleur finale
-   //FragColor = AttribsIn.couleur;
-   FragColor = vec4( 0.5, 0.5, 0.5, 1.0 ); // gris moche!
+    else {
+        FragColor = AttribsIn.couleur;
+    }
 
-   // vec4 coul = calculerReflexion( L, N, O );
-   // ...
+    if(texnumero){
+        if(afficheTexelFonce ==1 ){
+            FragColor = FragColor *(texture+1)/2;
+        }
+        else if (afficheTexelFonce ==2 && ((texture.r + texture.g + texture.b) / 3.0) < 0.1){
+            discard //shouldn't write any pixel
+        }
+        else {
+            FragColor = FragColor * texture ;
+        }
+    } 
+  if ( afficheNormales ) {
+      FragColor = vec4(normalize(AttribsIn.normale),1.0);
+   } else {
+      uniform mat3 matrVisu;
+      FragColor *= calculerSpot(transpose(inverse(matrVisu)) * LightSource[0].spotDirection, normalize(AttribsIn.directionLumiere));
+   }
 
-   //if ( afficheNormales ) FragColor = vec4(N,1.0);
 }
