@@ -136,6 +136,25 @@ void calculerPhysique( )
       // À MODIFIER (partie 1)
       // déplacer les particules en utilisant le nuanceur de rétroaction
       // ... (MODIFIER)
+       glUseProgram( progRetroaction );
+       glUniform1f( locdtRetroaction, parametres.dt );
+
+       glBindBufferBase( GL_TRANSFORM_FEEDBACK_BUFFER, 0, vbo[1] );
+
+       glBindVertexArray( vao[1] ); 
+       glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+
+       glVertexAttribPointer( locpositionRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,position) ) );
+       glVertexAttribPointer( loccouleurRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,couleur) ) );
+       glVertexAttribPointer( locvitesseRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,vitesse) ) );
+       glVertexAttribPointer( loctempsRestantRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,tempsRestant) ) );
+      
+       // désactiver le tramage
+       // glEnable( GL_RASTERIZER_DISCARD );
+       
+       // débuter la rétroaction
+       
+        glBeginTransformFeedback( GL_TRIANGLES );
 
       // débuter la requête (si impression)
       if ( etat.impression )
@@ -143,7 +162,11 @@ void calculerPhysique( )
 
       // « dessiner »
       // ... (MODIFIER)
-
+        glDrawArrays( GL_TRIANGLES, 0, sizeof(part)/sizeof(Part) );
+        // terminer la rétroaction
+         glEndTransformFeedback();
+       // réactiver le tramage
+        glDisable( GL_RASTERIZER_DISCARD );
       // terminer la requête (si impression)
       if ( etat.impression )
          glEndQuery( GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN );
@@ -368,8 +391,8 @@ void chargerNuanceurs()
       }
 
       // À MODIFIER (partie 1)
-      //const GLchar* vars[] = { ... };
-      //glTransformFeedbackVaryings( progRetroaction, sizeof(vars)/sizeof(vars[0]), vars, GL_INTERLEAVED_ATTRIBS );
+      const GLchar* vars[] = {position,vitesse,couleur, };
+      glTransformFeedbackVaryings( progRetroaction, sizeof(vars)/sizeof(vars[0]), vars, GL_INTERLEAVED_ATTRIBS );
 
       // faire l'édition des liens du programme
       glLinkProgram( progRetroaction );
