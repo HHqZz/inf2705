@@ -93,7 +93,7 @@ public:
    }
    bool enPerspective;       // indique si on est en mode Perspective (true) ou Ortho (false)
    bool enmouvement;         // le modèle est en mouvement/rotation automatique ou non
-   bool impression;          // on veut une impression des propriétés des premières particules
+   bool impression ;          // on veut une impression des propriétés des premières particules
    bool afficheAxes;         // indique si on affiche les axes
    GLenum modePolygone;      // comment afficher les polygones
    int texnumero;            // numéro de la texture utilisée: 0-aucune, 1-étincelle, 2-oiseau, 3-leprechaun
@@ -137,24 +137,37 @@ void calculerPhysique( )
       // déplacer les particules en utilisant le nuanceur de rétroaction
       // ... (MODIFIER)
        glUseProgram( progRetroaction );
-       glUniform1f( locdtRetroaction, parametres.dt );
+
+       glUniform3fv(locbDimRetroaction, 1, glm::value_ptr(etat.bDim));
+	 glUniform3fv(locpositionPuitsRetroaction, 1, glm::value_ptr(etat.positionPuits));
+
+       glUniform1f(loctempsRetroaction, parametres.temps);
+	 glUniform1f(locdtRetroaction, parametres.dt);
+	 glUniform1f(loctempsMaxRetroaction, parametres.tempsMax);
+	 glUniform1f(locgraviteRetroaction, parametres.gravite);
 
        glBindBufferBase( GL_TRANSFORM_FEEDBACK_BUFFER, 0, vbo[1] );
 
        glBindVertexArray( vao[1] ); 
        glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
 
-       glVertexAttribPointer( locpositionRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,position) ) );
-       glVertexAttribPointer( loccouleurRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,couleur) ) );
-       glVertexAttribPointer( locvitesseRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,vitesse) ) );
-       glVertexAttribPointer( loctempsRestantRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,tempsRestant) ) );
-      
+
+       glVertexAttribPointer( locpositionRetroaction, 3, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,position) ) );
+       glVertexAttribPointer( locvitesseRetroaction, 3, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,couleur) ) );
+       glVertexAttribPointer( loccouleurRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,vitesse) ) );
+       glVertexAttribPointer( loctempsRestantRetroaction, 1, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,tempsRestant) ) );
+
+
+      glEnableVertexAttribArray(locpositionRetroaction);
+	glEnableVertexAttribArray(locvitesseRetroaction);
+	glEnableVertexAttribArray(loccouleurRetroaction);
+	glEnableVertexAttribArray(loctempsRestantRetroaction);
+
        // désactiver le tramage
-       // glEnable( GL_RASTERIZER_DISCARD );
+      glEnable( GL_RASTERIZER_DISCARD );
        
        // débuter la rétroaction
-       
-        glBeginTransformFeedback( GL_TRIANGLES );
+     glBeginTransformFeedback( GL_POINTS);
 
       // débuter la requête (si impression)
       if ( etat.impression )
@@ -162,9 +175,9 @@ void calculerPhysique( )
 
       // « dessiner »
       // ... (MODIFIER)
-        glDrawArrays( GL_TRIANGLES, 0, sizeof(part)/sizeof(Part) );
+        glDrawArrays( GL_POINTS, vbo[1], parametres.nparticules );
         // terminer la rétroaction
-         glEndTransformFeedback();
+        glEndTransformFeedback();
        // réactiver le tramage
         glDisable( GL_RASTERIZER_DISCARD );
       // terminer la requête (si impression)
@@ -391,7 +404,7 @@ void chargerNuanceurs()
       }
 
       // À MODIFIER (partie 1)
-      const GLchar* vars[] = {position,vitesse,couleur, };
+      const GLchar* vars[] = {"positionMod","vitesseMod","couleurMod","tempsRestantMod" };
       glTransformFeedbackVaryings( progRetroaction, sizeof(vars)/sizeof(vars[0]), vars, GL_INTERLEAVED_ATTRIBS );
 
       // faire l'édition des liens du programme
@@ -556,7 +569,7 @@ void FenetreTP::afficherScene()
    }matrModel.PopMatrix(); glUniformMatrix4fv( locmatrModelBase, 1, GL_FALSE, matrModel );
 
    // afficher les particules
-   //glActiveTexture( GL_TEXTURE0 ); // activer la texture '0' (valeur de défaut)
+   glActiveTexture( GL_TEXTURE0 ); // activer la texture '0' (valeur de défaut)
    glUseProgram( prog );
    glUniformMatrix4fv( locmatrProj, 1, GL_FALSE, matrProj );
    glUniformMatrix4fv( locmatrVisu, 1, GL_FALSE, matrVisu );
@@ -581,7 +594,7 @@ void FenetreTP::afficherScene()
    }
 
    // tracer le résultat de la rétroaction
-   //glDrawTransformFeedback( GL_POINTS, tfo[0] );
+   glDrawTransformFeedback( GL_POINTS, tfo[0] );
    glDrawArrays( GL_POINTS, 0, parametres.nparticules );
 
    glBindTexture( GL_TEXTURE_2D, 0 );

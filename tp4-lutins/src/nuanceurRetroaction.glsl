@@ -31,7 +31,7 @@ void main( void )
 {
    // Mettre un test bidon afin que l'optimisation du compilateur n'élimine pas les attributs dt, gravite, tempsMax positionPuits et bDim.
    // Vous ENLEVEREZ cet énoncé inutile!
-   if ( dt+gravite+tempsMax+positionPuits.x < -100000 ) tempsRestantMod += .000001;
+   //if ( dt+gravite+tempsMax+positionPuits.x < -100000 ) tempsRestantMod += .000001;
 
    if ( tempsRestant <= 0.0 )
    {
@@ -47,12 +47,12 @@ void main( void )
       //vitesseMod = vec3( -0.8, 0., 0.6 );
 
       // nouveau temps de vie
-      tempsRestantMod = myrandom(seed) * tempsMax; // entre 0 et tempsMax secondes
+      tempsRestantMod = myrandom(seed++) * tempsMax; // entre 0 et tempsMax secondes
 
       // interpolation linéaire entre COULMIN et COULMAX
       const float COULMIN = 0.2; // valeur minimale d'une composante de couleur lorsque la particule (re)naît
       const float COULMAX = 0.9; // valeur maximale d'une composante de couleur lorsque la particule (re)naît
-      couleurMod = myrandom(seed) * (COULMAX - COULMIN) + COULMIN ; // valeur entre min et max
+      couleurMod = vec4(myrandom(seed) * (COULMAX - COULMIN) + COULMIN) ; // valeur entre min et max
    }
    else
    {
@@ -61,7 +61,7 @@ void main( void )
       vitesseMod = vitesse;
 
       // diminuer son temps de vie
-      tempsRestantMod = tempsRestant;
+      tempsRestantMod = tempsRestant - dt;
 
       // garder la couleur courante
       couleurMod = couleur;
@@ -81,10 +81,13 @@ void main( void )
         vitesseMod = vitReflechieSphUnitaire / bDim ;
         }
       // collision avec le sol ?
-      // ...
+        if(position.z<0)
+        {
+            vitesseMod.z *= -1; // inverse direction vitesse de la particule
+        }
 
       // appliquer la gravité
-      // ...
-      positionMod =  gravite*position[2]; // ?????????
+        vitesseMod += vec3(0,0,-dt * gravite);
+        positionMod += vitesseMod * dt;
    }
 }
