@@ -44,16 +44,21 @@ void main( void )
       vitesseMod = vec3( mix( -0.5, 0.5, myrandom(seed++) ),   // entre -0.5 et 0.5
                          mix( -0.5, 0.5, myrandom(seed++) ),   // entre -0.5 et 0.5
                          mix(  0.5, 1.0, myrandom(seed++) ) ); // entre  0.5 et 1
-      //vitesseMod = vec3( -0.8, 0., 0.6 );
+      // vitesseMod = vec3( -0.8, 0., 0.6 );
 
       // nouveau temps de vie
-      tempsRestantMod = myrandom(seed++) * tempsMax; // entre 0 et tempsMax secondes
+      tempsRestantMod = myrandom(seed++) * tempsMax ; // entre 0 et tempsMax secondes
 
       // interpolation linéaire entre COULMIN et COULMAX
       const float COULMIN = 0.2; // valeur minimale d'une composante de couleur lorsque la particule (re)naît
       const float COULMAX = 0.9; // valeur maximale d'une composante de couleur lorsque la particule (re)naît
-      couleurMod = vec4(myrandom(seed) * (COULMAX - COULMIN) + COULMIN) ; // valeur entre min et max
+
+      couleurMod = vec4(mix(COULMIN, COULMAX, myrandom(seed++)),
+                        mix(COULMIN, COULMAX, myrandom(seed++)),
+                        mix(COULMIN, COULMAX, myrandom(seed++)),
+                        mix(COULMIN, COULMAX, myrandom(seed++))); // valeur entre min et max
    }
+
    else
    {
       // avancer la particule
@@ -75,19 +80,20 @@ void main( void )
         float dist = length ( posSphUnitaire );
         if ( dist >= 1.0 ) // ... la particule est sortie de la bulle
         {
-        positionMod = ( 2.0 - dist ) * positionMod ;
-        vec3 N = posSphUnitaire / dist ; // normaliser N
-        vec3 vitReflechieSphUnitaire = reflect ( vitSphUnitaire , N );
-        vitesseMod = vitReflechieSphUnitaire / bDim ;
+          positionMod = ( 2.0 - dist ) * positionMod ;
+          vec3 N = posSphUnitaire / dist ; // normaliser N
+          vec3 vitReflechieSphUnitaire = reflect ( vitSphUnitaire , N );
+          vitesseMod = vitReflechieSphUnitaire / bDim ;
         }
       // collision avec le sol ?
         if(position.z<0)
         {
-            vitesseMod.z *= -1; // inverse direction vitesse de la particule
+          vitesseMod.z *= -1; // inverse direction vitesse de la particule
+          positionMod.z = 0.000001; // Pour eviter que la particule reste bloquee dans le sol
         }
 
       // appliquer la gravité
-        vitesseMod += vec3(0,0,-dt * gravite);
+        vitesseMod += vec3(0,0,-dt *gravite);
         positionMod += vitesseMod * dt;
    }
 }
