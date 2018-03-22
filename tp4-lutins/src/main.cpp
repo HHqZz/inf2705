@@ -1,7 +1,7 @@
 // Prénoms, noms et matricule des membres de l'équipe:
-// - Prénom1 NOM1 (matricule1)
-// - Prénom2 NOM2 (matricule2)
-#warning "Écrire les prénoms, noms et matricule des membres de l'équipe dans le fichier et commenter cette ligne"
+// - Constantin Bouis (1783438)
+// - Soufiane Houimidi (matricule2)
+#warning "demandez matricule a soufiane"
 
 #include <stdlib.h>
 #include <iostream>
@@ -153,8 +153,8 @@ void calculerPhysique( )
 
 
        glVertexAttribPointer( locpositionRetroaction, 3, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,position) ) );
-       glVertexAttribPointer( locvitesseRetroaction, 3, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,couleur) ) );
-       glVertexAttribPointer( loccouleurRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,vitesse) ) );
+       glVertexAttribPointer( locvitesseRetroaction, 3, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,vitesse) ) );
+       glVertexAttribPointer( loccouleurRetroaction, 4, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,couleur) ) );
        glVertexAttribPointer( loctempsRestantRetroaction, 1, GL_FLOAT, GL_FALSE, sizeof(Part), reinterpret_cast<void*>( offsetof(Part,tempsRestant) ) );
 
 
@@ -163,28 +163,24 @@ void calculerPhysique( )
 	glEnableVertexAttribArray(loccouleurRetroaction);
 	glEnableVertexAttribArray(loctempsRestantRetroaction);
 
-       // désactiver le tramage
-      glEnable( GL_RASTERIZER_DISCARD );
-       
-       // débuter la rétroaction
-     glBeginTransformFeedback( GL_POINTS);
+  
 
       // débuter la requête (si impression)
       if ( etat.impression )
          glBeginQuery( GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, requete );
 
       // « dessiner »
-      // ... (MODIFIER)
-        glDrawArrays( GL_POINTS, vbo[1], parametres.nparticules );
-        // terminer la rétroaction
-        glEndTransformFeedback();
-       // réactiver le tramage
-        glDisable( GL_RASTERIZER_DISCARD );
+      glEnable( GL_RASTERIZER_DISCARD );
+      glBeginTransformFeedback( GL_POINTS);
+      glDrawArrays( GL_POINTS, 0, parametres.nparticules );
+      glEndTransformFeedback();
+      glDisable( GL_RASTERIZER_DISCARD );
+
       // terminer la requête (si impression)
       if ( etat.impression )
          glEndQuery( GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN );
 
-      glBindVertexArray( 0 );              // désélectionner le VAO
+      glBindVertexArray( 0 ); // désélectionner le VAO
 
       if ( etat.impression )
       {
