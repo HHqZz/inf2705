@@ -1,7 +1,6 @@
 // Prénoms, noms et matricule des membres de l'équipe:
 // - Constantin Bouis (1783438)
-// - Soufiane Houimidi (matricule2)
-#warning "demandez matricule a soufiane"
+// - Soufiane Houimidi (1819034)
 
 #include <stdlib.h>
 #include <iostream>

@@ -3,12 +3,17 @@ Indice: pour bien répondre à ces deux questions, essayez de voir si votre rép
 
 Q1: Dans la partie 1, des points de taille fixe sont affichés à l'écran. Leur taille est donnée par la variable gl_PointSize.
     i) Comment faire pour que la taille d'un point varie de façon inverse à sa distance du plan avant du volume de visualisation ?
+    Dans le nuanceur de geometrie, il suffit d'appliquer la formule de l'inverse de la distance sur gl_PointSize.
     ii) Donnez l'énoncé GLSL que vous utiliseriez pour implanter ceci.
+    Ce serait donc : gl_PointSize = 1/gl_in[0].gl_Position.z;
 
 
 
 Q2: Pour afficher une étincelle qui tourne sur elle-même, on a appliqué une matrice de rotation sur les quatre sommets.
     i) Pourrait-on faire tourner l'étincelle en appliquant la même matrice de rotation sur les coordonnées de texture plutôt que sur les coordonnées des sommets?
+        Je pense qu'on pourrait modifier directement les positions de la texture.
     ii) Quel problème observerions-nous alors et comment devrait-il être corrigé?
+        J'observe que les coins de la texture ne sont plus alignes avec le reste de la texture puisqu ils sont en pleine rotation.
+        Pour corriger ce probleme..?
 
     Afin de facilement répondre à cette question, vous pouvez remplacer (temporairement!) l'image de l'étincelle de ce TP par l'image de l'échiquier du TP3.  Si vous appliquez ensuite la matrice de rotation sur les coordonnées de texture plutôt que sur les coordonnées des sommets, vous pourrez alors très bien voir ce qui se passe.
