@@ -115,13 +115,14 @@ void main( void )
 
    // Déplacement selon la fonction mathématique (partie 1)
    // étape 1: mettre xy entre -bDim et +bDim
-   // ...
+   posModel.xy = posModel.xy*bDim.xy*2;
+   posModel.xy =posModel.xy-bDim.xy;
    // étape 2: évaluer le déplacement
-   // ....xyz = FctMath( ... );
-
+   posModel.z = FctMath(posModel.xy);
    // étape 3: calculer la normale
-   vec3 N = vec3(0.,0.,1.); // à modifier
-
+ vec3 N = vec3((FctMath(vec2(posModel.x+eps,posModel.y))-FctMath(vec2(posModel.x-eps, posModel.y)))/(2*eps),
+             (FctMath(vec2(posModel.x,posModel.y+eps))-FctMath(vec2(posModel.x,posModel.y-eps)))/(2*eps),
+             -1.0);
 #else
 
    // déplacement selon la texture (partie 2)
@@ -131,7 +132,8 @@ void main( void )
    // ....z = FctText( ... );
 
    // calculer la normale
-   vec3 N = vec3(0.,0.,1.); // à modifier
+    vec3 N = vec3(0.,0.,1.); // à modifier
+
 
 #endif
 
