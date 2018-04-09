@@ -1,6 +1,6 @@
 // Prénoms, noms et matricule des membres de l'équipe:
-// - Prénom1 NOM1
-// - Prénom2 NOM2
+// - Constantin Bouis 1783438
+// - Soufiane Houimidi
 #warning "Écrire les prénoms, noms et matricule des membres de l'équipe ci-dessus et commenter cette ligne"
 
 #include <iostream>
@@ -293,7 +293,6 @@ void chargerNuanceurs()
          ProgNuanceur::afficherLogCompile( nuanceurObj );
          delete [] chainesSommets[1];
       }
-#if 0
       // partie 1: À ACTIVER (enlever le #if 0 et le #endif)
       // attacher le nuanceur de controle de la tessellation
       const GLchar *chainesTessCtrl[2] = { preambulechar, ProgNuanceur::lireNuanceur( "nuanceurTessCtrl.glsl" ) };
@@ -306,6 +305,7 @@ void chargerNuanceurs()
          ProgNuanceur::afficherLogCompile( nuanceurObj );
          delete [] chainesTessCtrl[1];
       }
+      
       // attacher le nuanceur d'évaluation de la tessellation
       const GLchar *chainesTessEval[2] = { preambulechar, ProgNuanceur::lireNuanceur( "nuanceurTessEval.glsl" ) };
       if ( chainesTessEval[1] != NULL )
@@ -317,7 +317,7 @@ void chargerNuanceurs()
          ProgNuanceur::afficherLogCompile( nuanceurObj );
          delete [] chainesTessEval[1];
       }
-#endif
+
       // attacher le nuanceur de géometrie
       const GLchar *chainesGeometrie[2] = { preambulechar, ProgNuanceur::lireNuanceur( "nuanceurGeometrie.glsl" ) };
       if ( chainesGeometrie[1] != NULL )
@@ -536,8 +536,8 @@ void afficherModele()
    glPatchParameteri( GL_PATCH_VERTICES, 4 );
 
    // À MODIFIER (utiliser des GL_PATCHES)
-   glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
-   //glDrawArrays( GL_PATCHES, 0, 4 ); // UTILISER des GL_PATCHES plutôt que des GL_TRIANGLES
+   //glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+   glDrawArrays( GL_PATCHES, 0, 4 ); // UTILISER des GL_PATCHES plutôt que des GL_TRIANGLES
 
    glBindVertexArray( 0 );
 
