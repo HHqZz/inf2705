@@ -465,7 +465,17 @@ void FenetreTP::conclure()
 void definirProjection( int OeilMult, int w, int h ) // 0: mono, -1: oeil gauche, +1: oeil droit
 {
    // partie 2: utiliser plutôt Frustum() pour le stéréo
-   matrProj.Perspective( 35.0, (GLdouble) w / (GLdouble) h, vue.zavant, vue.zarriere );
+  // matrProj.Perspective( 35.0, (GLdouble) w / (GLdouble) h, vue.zavant, vue.zarriere );
+const GLdouble resolution = 100.0; // pixels par pouce
+   GLdouble oeilDecalage = OeilMult * vue.dip/2.0;
+   GLdouble proportionProfondeur = vue.zavant / vue.zecran; 
+   matrProj.Frustum( (-0.5 * w / resolution - oeilDecalage ) * proportionProfondeur,
+                     ( 0.5 * w / resolution - oeilDecalage ) * proportionProfondeur,
+                     (-0.5 * h / resolution                ) * proportionProfondeur,
+                     ( 0.5 * h / resolution                ) * proportionProfondeur,
+   vue.zavant, vue.zarriere );
+   matrProj.Translate( -oeilDecalage, 0.0, 0.0 );
+   glUniformMatrix4fv( locmatrProj, 1, GL_FALSE, matrProj );
 }
 
 void afficherDecoration()
@@ -605,6 +615,9 @@ void FenetreTP::afficherScene()
    switch ( vue.affichageStereo )
    {
    case 0: // mono
+      // revenir a ce viewport apres le mode double
+      glViewport(0, 0, largeur_, hauteur_);
+
       definirProjection( 0, largeur_, hauteur_ );
       glUniformMatrix4fv( locmatrProj, 1, GL_FALSE, matrProj );
       afficherModele();
@@ -613,14 +626,27 @@ void FenetreTP::afficherScene()
    case 1: // stéréo anaglyphe
       // partie 2: à modifier pour afficher en anaglyphe
       definirProjection( 0, largeur_, hauteur_ );
+      glColorMask( GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE );
       glUniformMatrix4fv( locmatrProj, 1, GL_FALSE, matrProj );
       afficherModele();
+      glClear( GL_DEPTH_BUFFER_BIT );
+      definirProjection( GL_TRUE, largeur_, hauteur_ );
+      glColorMask( GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE );
+      afficherModele();
+      glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
       break;
 
    case 2: // stéréo double
       // partie 2: à modifier pour afficher en stéréo double
-      definirProjection( 0, largeur_, hauteur_ );
-      glUniformMatrix4fv( locmatrProj, 1, GL_FALSE, matrProj );
+       GLfloat larg_ = 0.5*largeur_;
+       GLfloat haut_ = hauteur_;
+      glViewport( 0, 0, larg_,haut_); 
+      definirProjection( -1, largeur_, hauteur_ );
+      //glUniformMatrix4fv( locmatrProj, 1, GL_FALSE, matrProj );
+      afficherModele();
+      glClear(GL_DEPTH_BUFFER_BIT);
+      glViewport(larg_, 0, larg_, haut_);
+      definirProjection(1, largeur_, hauteur_);
       afficherModele();
       break;
    }

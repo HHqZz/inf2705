@@ -97,8 +97,7 @@ float FctMath( vec2 uv ) // uv est dans [-bDim.x,bDim.x] X [-bDim.y,bDim.y]
 // déplacement du plan selon la texture
 float FctText( vec2 texCoord )
 {
-   //...
-   return 0.0; // à modifier!
+   return length( texture(textureDepl,texCoord))* facteurDeform/10;
 }
 
 void main( void )
@@ -109,7 +108,7 @@ void main( void )
    vec4 posModel = interpole( gl_in[0].gl_Position, gl_in[1].gl_Position, gl_in[2].gl_Position, gl_in[3].gl_Position );
 
    // générer (en utilisant directement posModel.xy) les coordonnées de texture plutôt que les interpoler
-   //AttribsOut.texCoord = ...;
+   AttribsOut.texCoord = (posModel.xy - vec2(0.5, 0.5)) * bDim.xy;
 
 #if ( INDICEFONCTION != 0 )
 
@@ -127,12 +126,14 @@ void main( void )
 
    // déplacement selon la texture (partie 2)
    // mettre xy entre -bDim et +bDim
-   // ...
+    posModel.xy = posModel.xy*bDim.xy*2;
+    posModel.xy =posModel.xy-bDim.xy;
    // évaluer le déplacement
-   // ....z = FctText( ... );
+    //posModel.z = FctText( posModel.xy);
 
    // calculer la normale
     vec3 N = vec3(0.,0.,1.); // à modifier
+
 
 
 #endif
