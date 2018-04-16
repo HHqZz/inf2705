@@ -350,8 +350,8 @@ void chargerNuanceurs()
       if ( ( locmatrVisu = glGetUniformLocation( prog, "matrVisu" ) ) == -1 ) std::cerr << "!!! pas trouvé la \"Location\" de matrVisu" << std::endl;
       if ( ( locmatrProj = glGetUniformLocation( prog, "matrProj" ) ) == -1 ) std::cerr << "!!! pas trouvé la \"Location\" de matrProj" << std::endl;
       if ( ( locmatrNormale = glGetUniformLocation( prog, "matrNormale" ) ) == -1 ) std::cerr << "!!! pas trouvé la \"Location\" de matrNormale" << std::endl;
-      // if ( ( loctextureDepl = glGetUniformLocation( prog, "textureDepl" ) ) == -1 ) std::cerr << "!!! pas trouvé la \"Location\" de textureDepl" << std::endl;
-      // if ( ( loctextureCoul = glGetUniformLocation( prog, "textureCoul" ) ) == -1 ) std::cerr << "!!! pas trouvé la \"Location\" de textureCoul" << std::endl;
+      //if ( ( loctextureDepl = glGetUniformLocation( prog, "textureDepl" ) ) == -1 ) std::cerr << "!!! pas trouvé la \"Location\" de textureDepl" << std::endl;
+      //if ( ( loctextureCoul = glGetUniformLocation( prog, "textureCoul" ) ) == -1 ) std::cerr << "!!! pas trouvé la \"Location\" de textureCoul" << std::endl;
       loctextureDepl = glGetUniformLocation( prog, "textureDepl" );
       loctextureCoul = glGetUniformLocation( prog, "textureCoul" );
       if ( ( locfacteurDeform = glGetUniformLocation( prog, "facteurDeform" ) ) == -1 ) std::cerr << "!!! pas trouvé la \"Location\" de facteurDeform" << std::endl;

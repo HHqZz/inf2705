@@ -129,10 +129,14 @@ void main( void )
     posModel.xy = posModel.xy*bDim.xy*2;
     posModel.xy =posModel.xy-bDim.xy;
    // évaluer le déplacement
-    //posModel.z = FctText( posModel.xy);
+    posModel.z = FctText( posModel.xy);
 
    // calculer la normale
-    vec3 N = vec3(0.,0.,1.); // à modifier
+   float coordX = ( FctText( vec2(posModel.x + eps, posModel.y) ) - FctText( vec2(posModel.x - eps, posModel.y) ) ) / ( 2*eps );
+   float coordY = ( FctText( vec2(posModel.x, posModel.y + eps) ) - FctText( vec2(posModel.x, posModel.y - eps) ) ) / ( 2*eps );
+   vec3 N = vec3( coordX, coordY, -1.0 );
+
+   N = normalize( N );
 
 
 
@@ -146,3 +150,6 @@ void main( void )
 
    gl_Position = posModel;
 }
+
+
+
